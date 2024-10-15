@@ -1,0 +1,93 @@
+#!/bin/bash
+
+
+# Installation script of Activity-Browser and Brightway2+LCA_Algebraic
+
+# Don't forgot to copy/download this file AND Requirements folder
+# to use it, open a terminal, go to the directory where this file is registered and run :
+# bash Install_AB_BW_LCA_algeb
+
+# Activity-Browser env name : ab
+# LCA_Algebraic env name : bw
+
+
+# Usefull commands :
+# Go in an environnement : conda activate env_name
+# Go back from an environnement : conda deactivate
+
+# Run Activity-Browser (in ab): activity-browser
+# Run a brightway jupyter-notebook (in bw) : jupyter-notebook project_name.ipynb
+
+act_default=ab
+activity=""
+bw2_default=bw
+bw2=""
+
+
+echo "Last script update : 29/08/24"
+echo -e "Searching conda in your computer : \n"
+
+
+PS3="Choose an answer (1 or 2) :"
+
+if [ "$CONDA_PREFIX" = "" ]; then
+	echo "Conda (Mambaforge) will be downloaded"
+      wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+      bash Mambaforge-Linux-x86_64.sh
+      break
+      echo "skip conda installation"
+      break
+elif [ "$CONDA_PREFIX" != "" ];then
+      echo "Conda found at location $CONDA_PREFIX, skip installation"		 
+fi
+
+
+echo -e "\nWhat do you want to install ?"
+PS3="Choose an answer (1, 2 or 3) :"
+select i in "Activity-Browser" "Brightway2 + LCA_Algebraic" "Both" "Exit";do
+      if [ "$i" = "Activity-Browser" ]; then
+	      echo "Choose a new environment name for AB installation : "
+	      read activity 
+	      if [ "$activity" = "" ]; then
+	      	activity="$act_default"
+	      fi
+              echo "Activity-Browser installation in $activity environment."
+              read -p "Press any key to continue, or [Crtl + C] to abort ..."
+              conda env create -f Requirements/environment_AB_Linux.yml --name $activity
+              echo -e "\nInstallation finished. Activity-browser installed in $activity environment."
+       
+      elif [ "$i" = "Brightway2 + LCA_Algebraic" ]; then
+     	      echo "Choose a new environment name for BW installation : "
+	      read bw2 
+	      if [ "$bw2" = "" ]; then
+	      	bw2="$bw2_default"
+	      fi
+              echo "Brightway2 + LCA_Algebraic installation in $bw2 environment"
+              read -p "Press any key to continue, or [Crtl + C] to abort ..."              
+              conda env create -f Requirements/environment_BW_LCA.yml $bw2
+              echo -e "\nInstallation finished. ''LCA_Algebraic'' installed in $bw2 environment."
+              break
+      elif [ "$i" = "Both" ]; then
+      	      echo "Choose a new environment name for AB installation : "
+	      read activity 
+	      echo "Choose a new environment name for BW installation : "
+	      read bw2 
+	      if [ "$activity" = "" ]; then
+	      	activity="$act_default"
+	      fi
+	      if [ "$bw2" = "" ]; then
+	      	bw2="$bw2_default"
+	      fi      
+              echo -e "Activity-browser installation in $activity environment \n Brightway2 + LCA_Algebraic installation in $bw2 environment."
+              read -p "Press any key to continue, or [Crtl + C] to abort ..."              
+              conda env create -f Requirements/environment_BW_LCA.yml $activity
+              conda env create -f environment_AB_Linux.yml $bw2
+              echo -e "\nInstallation finished. Activity-browser installed in $activity environment, and LCA_Algebraic in $bw2 environment."
+              break
+      elif [ "$i" = "Exit" ]; then
+              echo "Installation canceled"
+              break
+      else
+              echo "Try again"
+      fi
+done
